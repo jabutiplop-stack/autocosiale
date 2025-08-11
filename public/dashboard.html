@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        main {
+            max-width: 500px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="checkbox"] {
+            margin-top: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Panel główny</h1>
+    <button onclick="logout()">Wyloguj</button>
+</header>
+
+<main>
+    <h2>Wyślij post</h2>
+    <form id="postForm">
+        <label for="postTitle">Tytuł posta:</label>
+        <input type="text" id="postTitle" name="postTitle" required>
+
+        <label>
+            <input type="checkbox" id="hasImage" name="hasImage">
+            Czy post ma zawierać obraz?
+        </label>
+
+        <button type="submit" style="margin-top: 15px;">Wyślij</button>
+    </form>
+
+    <div id="postResult" class="result" style="display:none;"></div>
+
+    <h2 style="margin-top:30px;">Wynik automatyzacji</h2>
+    <div id="automationResult" class="result">Brak danych...</div>
+</main>
+
+<script>
+    if (!sessionStorage.getItem("loggedIn")) {
+        window.location.href = "index.html";
+    }
+
+    function logout() {
+        sessionStorage.removeItem("loggedIn");
+        window.location.href = "index.html";
+    }
+
+    document.getElementById("postForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const postTitle = document.getElementById("postTitle").value;
+        const hasImage = document.getElementById("hasImage").checked;
+
+        const res = await fetch("/api/post", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ postTitle, hasImage })
+        });
+
+        const data = await res.json();
+        const resultDiv = document.getElementById("postResult");
+        resultDiv.style.display = "block";
+        resultDiv.innerHTML = `<p>${data.text}</p>` + (data.imageUrl ? `<img src="${data.imageUrl}" alt="Obraz">` : "");
+    });
+
+    async function fetchAutomationData() {
+        const res = await fetch("/api/automation-data");
+        const data = await res.json();
+        const resultDiv = document.getElementById("automationResult");
+        if (data.text) {
+            resultDiv.innerHTML = `<p>${data.text}</p>` + (data.imageUrl ? `<img src="${data.imageUrl}" alt="Obraz">` : "");
+        }
+    }
+
+    setInterval(fetchAutomationData, 3000);
+</script>
+</body>
+</html>

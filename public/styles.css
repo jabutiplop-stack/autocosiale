@@ -1,0 +1,253 @@
+/*
+   GLOBALNE STYLES I ZMIENNE
+   Użycie zmiennych CSS ułatwia utrzymanie spójnej kolorystyki.
+*/
+:root {
+    --primary-color: #4a5568;
+    --accent-color: #4c51bf;
+    --danger-color: #e53e3e;
+    --text-color: #2d3748;
+    --background-color: #f7fafc;
+    --card-background: #ffffff;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --border-radius: 0.5rem;
+}
+
+body {
+    font-family: var(--font-stack);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------------------------------------------------- */
+/* STRONY GŁÓWNE STYLES                                  */
+/* ---------------------------------------------------- */
+
+/* Kontener centralny dla strony logowania */
+.app-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+/* Ogólne style dla kart (card) */
+.card {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+.card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.card .lead {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ---------------------------------------------------- */
+/* FORMULARZE I KONTROLKI                               */
+/* ---------------------------------------------------- */
+
+.input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #fefefe;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn:hover {
+    background-color: #3f44a3;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn.danger {
+    background-color: var(--danger-color);
+}
+
+.btn.danger:hover {
+    background-color: #c53030;
+}
+
+.message {
+    color: var(--danger-color);
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------- */
+/* STRONA GŁÓWNA - PANEL                                */
+/* ---------------------------------------------------- */
+
+.dashboard-wrap {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Dwie kolumny, lewa węższa */
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.title {
+    font-size: 1.875rem; /* 30px */
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.subtitle {
+    color: #718096;
+    font-size: 1rem;
+}
+
+.post-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-form .input {
+    margin-bottom: 0.75rem;
+}
+
+#response p {
+    color: #48bb78;
+    background-color: #f0fff4;
+    padding: 1rem;
+    border: 1px solid #c6f6d5;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+}
+
+.posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.post {
+    display: flex;
+    gap: 1rem;
+    background-color: var(--card-background);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 3px 0 var(--shadow-color), 0 1px 2px 0 var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.post .thumb {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: #f7fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.post .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post .text-muted {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+.post .body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.post .meta {
+    font-size: 0.8rem;
+    color: #a0aec0;
+}
+
+/* ---------------------------------------------------- */
+/* RESPONSIVE DESIGN                                    */
+/* ---------------------------------------------------- */
+@media (max-width: 768px) {
+    .dashboard-wrap {
+        grid-template-columns: 1fr; /* Na małych ekranach tylko jedna kolumna */
+    }
+
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .topbar .btn {
+        width: 100%;
+        margin-top: 1rem;
+    }
+}
