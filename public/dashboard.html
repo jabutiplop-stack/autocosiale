@@ -114,15 +114,31 @@
     });
 
     async function fetchAutomationData() {
-        const res = await fetch("/api/automation-data");
-        const data = await res.json();
-        const resultDiv = document.getElementById("automationResult");
-        if (data.text) {
-            resultDiv.innerHTML = `<p>${data.text}</p>` + (data.imageUrl ? `<img src="${data.imageUrl}" alt="Obraz">` : "");
-        }
-    }
+    const res = await fetch("/api/automation-data");
+    const data = await res.json();
+    const resultDiv = document.getElementById("automationResult");
 
-    setInterval(fetchAutomationData, 3000);
+    if (data.text) {
+        // Tworzymy HTML dla głównego tekstu i obrazu
+        let htmlContent = `<p><strong>${data.text}</strong></p>`;
+        if (data.imageUrl) {
+            htmlContent += `<img src="${data.imageUrl}" alt="Obraz">`;
+        }
+        
+        // Jeśli istnieją dodatkowe teksty, dodajemy je do HTML
+        if (data.additionalTexts && Array.isArray(data.additionalTexts)) {
+            data.additionalTexts.forEach(text => {
+                htmlContent += `<p>${text}</p>`;
+            });
+        }
+        
+        resultDiv.innerHTML = htmlContent;
+    } else {
+        resultDiv.innerHTML = "<p>Brak danych z automatyzacji.</p>";
+    }
+}
+
+setInterval(fetchAutomationData, 3000);
 </script>
 </body>
 </html>

@@ -18,7 +18,12 @@ const PASSWORD = "password123";
 
 // przechowywanie danych z automatyzacji
 let automationData = {};
-
+// te trzy teksty, które mają być zawsze wyświetlane
+const additionalTexts = [
+    "Post AI agent:",
+    "Validatro:",
+    "Prompt Generator:"
+];
 // logowanie
 app.post("/api/login", (req, res) => {
     const { username, password } = req.body;
@@ -34,7 +39,7 @@ app.post("/api/post", async (req, res) => {
     const { postTitle, hasImage } = req.body;
 
     try {
-        await fetch("https://e6dd35b8037f.ngrok-free.app/webhook-test/02c049af-0e06-4e69-8377-8c24554f37d8", {
+        await fetch("https://e6dd35b8037f.ngrok-free.app/webhook/02c049af-0e06-4e69-8377-8c24554f37d8", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ postTitle, hasImage })
@@ -42,7 +47,6 @@ app.post("/api/post", async (req, res) => {
 
         res.json({
             text: "Twój post został wysłany!",
-            imageUrl: hasImage ? "https://picsum.photos/200" : null
         });
     } catch (err) {
         console.error("Błąd wysyłania webhooka:", err);
@@ -52,12 +56,16 @@ app.post("/api/post", async (req, res) => {
 
 // odbiór danych z automatyzacji
 app.post("/api/automation-webhook", (req, res) => {
-    automationData = req.body;
+    automationData = {
+        ...req.body, // Zachowaj istniejące dane (text, imageUrl)
+        additionalTexts: additionalTexts // Dodaj nowe teksty do obiektu
+    };
     res.json({ success: true });
 });
 
 // pobieranie danych z automatyzacji
 app.get("/api/automation-data", (req, res) => {
+    // Zwracamy cały obiekt, który teraz zawiera również additionalTexts
     res.json(automationData);
 });
 
