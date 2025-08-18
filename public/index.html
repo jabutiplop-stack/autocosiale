@@ -11,34 +11,17 @@
         <h2>Logowanie</h2>
         <p class="lead">Podaj dane dostępowe, aby wejść do panelu</p>
 
-        <input class="input" type="text" id="username" placeholder="Nazwa użytkownika">
-        <input class="input" type="password" id="password" placeholder="Hasło">
-        
-        <button class="btn" onclick="login()">Zaloguj</button>
+       
+        <form id="loginForm">
+            <input class="input" type="text" id="username" placeholder="Nazwa użytkownika" required>
+            <input class="input" type="password" id="password" placeholder="Hasło" required>
+            <button class="btn" type="submit">Zaloguj</button>
+        </form>
         <p id="message" class="message"></p>
 
     </div>
 </div>
 
-<script>
-async function login() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-        sessionStorage.setItem("loggedIn", "true");
-        window.location.href = "dashboard.html";
-    } else {
-        document.getElementById("message").innerText = data.message;
-    }
-}
-</script>
+<script src="main.js"></script>
 </body>
 </html>

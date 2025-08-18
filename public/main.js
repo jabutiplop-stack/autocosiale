@@ -4,29 +4,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logika dla formularza logowania (login.html)
     // ----------------------------------------
     const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
-
-            if (response.ok) {
-                // Po pomyślnym zalogowaniu przekierowujemy na stronę główną
-                window.location.href = '/'; 
-            } else {
-                alert('Błędne dane logowania.');
-            }
+        const response = await fetch('/api/login', { // Poprawiono na /api/login
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
         });
-    }
 
+        const data = await response.json(); // Dodano odczytanie JSON z odpowiedzi
+
+        if (data.success) {
+            // Po pomyślnym zalogowaniu przekierowujemy na stronę główną
+            window.location.href = '/'; 
+        } else {
+            alert(data.message); // Wyświetlanie komunikatu z serwera
+        }
+    });
+}
     // ----------------------------------------
     // Logika dla przycisku wylogowania (index.html)
     // ----------------------------------------

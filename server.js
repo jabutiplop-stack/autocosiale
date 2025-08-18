@@ -3,18 +3,28 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const fetch = require("node-fetch"); // dla webhooka
 const path = require("path");
+const { Pool } = require('pg'); // Dodano import dla bazy danych
+const bcrypt = require('bcryptjs'); // Dodano import dla haszowania haseł
 
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Konfiguracja połączenia z bazą danych
+const pool = new Pool({
+    user: 'root', // Zmień na swojego użytkownika
+    host: 'localhost',
+    database: 'uzytkownicy',
+    password: 'kociolek_123', // Zmień na swoje hasło
+    port: 5432,
+});
+
+
 // folder na frontend
 app.use(express.static(path.join(__dirname, "public")));
 
-// predefiniowany login
-const USERNAME = "admin";
-const PASSWORD = "password123";
+
 
 // przechowywanie danych z automatyzacji
 let automationData = {};
@@ -25,12 +35,28 @@ const additionalTexts = [
     "Prompt Generator:"
 ];
 // logowanie
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
     const { username, password } = req.body;
-    if (username === USERNAME && password === PASSWORD) {
-        res.json({ success: true, message: "Zalogowano pomyślnie" });
-    } else {
-        res.json({ success: false, message: "Błędne dane logowania" });
+
+    try {
+        const query = 'SELECT * FROM users WHERE username = $1';
+        const result = await pool.query(query, [username]);
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.json({ success: false, message: "Błędne dane logowania" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (isMatch) {
+            res.json({ success: true, message: "Zalogowano pomyślnie" });
+        } else {
+            res.json({ success: false, message: "Błędne dane logowania" });
+        }
+    } catch (err) {
+        console.error("Błąd logowania:", err);
+        res.status(500).json({ success: false, message: "Wystąpił błąd serwera" });
     }
 });
 
