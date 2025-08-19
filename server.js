@@ -61,7 +61,7 @@ app.post("/api/login", async (req, res) => {
         }
     
         // Teraz możesz bezpiecznie porównać hasła
-        const isMatch = await bcrypt.compare(password, user.password_hash);
+        const isMatch = await bcrypt.compare(password, user.password);
     
         if (isMatch) {
             req.session.userId = user.id;
