@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const response = await fetch('/api/post', {
                 method: 'POST',
+                credentials: "include",
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -67,7 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (promptsContainer) {
         async function fetchPrompts() {
             try {
-                const response = await fetch('/api/automation-data');
+                const response = await fetch('/api/automation-data', {
+                    credentials: "include" 
+                });
                 if (!response.ok) {
                     throw new Error('Brak autoryzacji');
                 }
