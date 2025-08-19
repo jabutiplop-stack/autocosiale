@@ -5,7 +5,8 @@ const fetch = require("node-fetch"); // dla webhooka
 const path = require("path");
 const { Pool } = require('pg'); // Dodano import dla bazy danych
 const bcrypt = require('bcryptjs'); // Dodano import dla haszowania haseł
-
+require('dotenv').config();
+const { Pool } = require('pg');
 
 const app = express();
 app.use(cors());
@@ -13,14 +14,16 @@ app.use(bodyParser.json());
 
 // Konfiguracja połączenia z bazą danych
 const pool = new Pool({
-    user: 'root', // Zmień na swojego użytkownika
-    host: 'localhost',
-    database: 'uzytkownicy',
-    password: 'kociolek_123', // Zmień na swoje hasło
-    port: 5432,
-});
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+  });
 
-
+  module.exports = {
+    query: (text, params) => pool.query(text, params),
+  };
 // folder na frontend
 app.use(express.static(path.join(__dirname, "public")));
 

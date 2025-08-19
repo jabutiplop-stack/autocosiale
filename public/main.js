@@ -1,46 +1,77 @@
 document.addEventListener('DOMContentLoaded', () => {
-
+    const express = require('express');
+    const bcrypt = require('bcrypt');
+    const db = require('./db'); // Upewnij się, że importujesz skonfigurowane połączenie z bazą
+    const app = express();
     // ----------------------------------------
     // Logika dla formularza logowania (login.html)
     // ----------------------------------------
-    const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        const response = await fetch('/api/login', { // Poprawiono na /api/login
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-
-        const data = await response.json(); // Dodano odczytanie JSON z odpowiedzi
-
-        if (data.success) {
-            // Po pomyślnym zalogowaniu przekierowujemy na stronę główną
-            window.location.href = '/'; 
-        } else {
-            alert(data.message); // Wyświetlanie komunikatu z serwera
+    app.post('/api/login', async (req, res) => {
+        // Używam 'email' zgodnie z naszą tabelą w bazie danych
+        const { username: email, password } = req.body; 
+    
+        // Prosta walidacja
+        if (!email || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Email i hasło są wymagane.' 
+            });
+        }
+    
+        try {
+            // 1. Znajdź użytkownika w bazie danych po adresie email
+            const queryText = 'SELECT * FROM users WHERE email = $1';
+            const { rows } = await db.query(queryText, [email]);
+    
+            // Jeśli zapytanie nic nie zwróciło, użytkownik nie istnieje
+            if (rows.length === 0) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Nieprawidłowy email lub hasło.' 
+                });
+            }
+    
+            const user = rows[0]; // Pobieramy dane użytkownika z bazy
+    
+            // 2. Porównaj hasło z hashem zapisanym w bazie
+            const isMatch = await bcrypt.compare(password, user.password_hash);
+    
+            if (isMatch) {
+                // 3. Jeśli hasła się zgadzają, zapisz ID użytkownika w sesji
+                req.session.userId = user.id; 
+                
+                // Wyślij odpowiedź o sukcesie
+                return res.json({ success: true, message: 'Zalogowano pomyślnie!' });
+            } else {
+                // Jeśli hasła się nie zgadzają
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Nieprawidłowy email lub hasło.' 
+                });
+            }
+    
+        } catch (err) {
+            console.error('Błąd podczas logowania:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Wystąpił błąd serwera.' 
+            });
         }
     });
-}
+    
     // ----------------------------------------
     // Logika dla przycisku wylogowania (index.html)
     // ----------------------------------------
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            const response = await fetch('/logout', { method: 'POST' });
-            if (response.ok) {
-                // Po wylogowaniu przekierowujemy na stronę główną, która przekieruje do logowania
-                window.location.href = '/'; 
+    app.post('/logout', (req, res) => {
+        req.session.destroy(err => {
+            if (err) {
+                return res.status(500).send('Nie udało się wylogować.');
             }
+            res.clearCookie('connect.sid'); // Wyczyść ciasteczko sesji
+            res.status(200).send('Wylogowano pomyślnie.');
         });
-    }
+    });
+    
 
     // ----------------------------------------
     // Logika dla formularza postów (index.html)
