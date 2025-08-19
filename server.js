@@ -51,19 +51,20 @@ app.post("/api/login", async (req, res) => {
     const { email, password } = req.body; 
 
     try {
-        const query = 'SELECT * FROM users WHERE username = $1';
+        const query = 'SELECT * FROM users WHERE email = $1';
         const result = await pool.query(query, [email]);
         const user = result.rows[0];
-
+    
+        // DODANA WERYFIKACJA UŻYTKOWNIKA
         if (!user) {
             return res.json({ success: false, message: "Błędne dane logowania" });
         }
-
+    
+        // Teraz możesz bezpiecznie porównać hasła
         const isMatch = await bcrypt.compare(password, user.password_hash);
-
+    
         if (isMatch) {
-            // Zapisanie ID użytkownika w sesji
-            req.session.userId = user.id; 
+            req.session.userId = user.id;
             res.json({ success: true, message: "Zalogowano pomyślnie" });
         } else {
             res.json({ success: false, message: "Błędne dane logowania" });
