@@ -51,7 +51,7 @@ app.post("/api/login", async (req, res) => {
     const { email, password } = req.body; 
 
     try {
-        const query = 'SELECT * FROM users WHERE email = $1';
+        const query = 'SELECT * FROM uzytkownicy WHERE email = $1';
         const result = await pool.query(query, [email]);
         const user = result.rows[0];
 
