@@ -6,7 +6,6 @@ const path = require("path");
 const { Pool } = require('pg'); // Dodano import dla bazy danych
 const bcrypt = require('bcryptjs'); // Dodano import dla haszowania haseł
 require('dotenv').config();
-const { Pool } = require('pg');
 
 const app = express();
 app.use(cors());
