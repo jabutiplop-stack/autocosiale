@@ -16,8 +16,12 @@ app.use(bodyParser.json());
 app.use(session({
     secret: process.env.SESSION_SECRET || 'super_tajny_klucz_sesji', // Wartość domyślna w przypadku braku .env
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: 'auto' }
+    saveUninitialized: false,
+    cookie: {
+        secure: true,      
+        httpOnly: true,
+        sameSite: 'lax'  
+      }
 }));
 
 // Konfiguracja połączenia z bazą danych
