@@ -4,6 +4,7 @@ const cors = require("cors");
 const fetch = require("node-fetch");
 const path = require("path");
 const session = require('express-session'); // Dodano: obsługa sesji
+const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
@@ -14,15 +15,20 @@ app.use(bodyParser.json());
 
 // Konfiguracja sesji
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Wartość domyślna w przypadku braku .env
+    store: new pgSession({
+      pool: pool,                // używa tego samego poola co aplikacja
+      tableName: 'session'       // nazwa tabeli w DB (domyślnie 'session')
+    }),
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false,      
-        httpOnly: true,
-        sameSite: 'lax'  
-      }
-}));
+      secure: false,   // HTTP – zostaw false
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 // 1 dzień
+    }
+  }));
 
 // Konfiguracja połączenia z bazą danych
 const pool = new Pool({
