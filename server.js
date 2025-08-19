@@ -13,6 +13,21 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+
+// Konfiguracja połączenia z bazą danych
+const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+});
+
+module.exports = {
+    query: (text, params) => pool.query(text, params),
+};
+
+
 // Konfiguracja sesji
 app.use(session({
     store: new pgSession({
@@ -30,18 +45,7 @@ app.use(session({
     }
   }));
 
-// Konfiguracja połączenia z bazą danych
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-});
 
-module.exports = {
-    query: (text, params) => pool.query(text, params),
-};
 
 // Folder na frontend
 app.use(express.static(path.join(__dirname, "public")));
