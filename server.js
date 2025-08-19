@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 // Konfiguracja sesji
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'super_tajny_klucz_sesji', // Wartość domyślna w przypadku braku .env
+    secret: process.env.SESSION_SECRET, // Wartość domyślna w przypadku braku .env
     resave: false,
     saveUninitialized: false,
     cookie: {
