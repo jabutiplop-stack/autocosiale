@@ -1,15 +1,24 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const fetch = require("node-fetch"); // dla webhooka
+const fetch = require("node-fetch");
 const path = require("path");
-const { Pool } = require('pg'); // Dodano import dla bazy danych
-const bcrypt = require('bcryptjs'); // Dodano import dla haszowania haseł
+const session = require('express-session'); // Dodano: obsługa sesji
+const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// Konfiguracja sesji
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'super_tajny_klucz_sesji', // Wartość domyślna w przypadku braku .env
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: 'auto' }
+}));
 
 // Konfiguracja połączenia z bazą danych
 const pool = new Pool({
@@ -18,15 +27,14 @@ const pool = new Pool({
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
-  });
+});
 
-  module.exports = {
+module.exports = {
     query: (text, params) => pool.query(text, params),
-  };
-// folder na frontend
+};
+
+// Folder na frontend
 app.use(express.static(path.join(__dirname, "public")));
-
-
 
 // przechowywanie danych z automatyzacji
 let automationData = {};
@@ -36,22 +44,26 @@ const additionalTexts = [
     "Validatro:",
     "Prompt Generator:"
 ];
+
 // logowanie
 app.post("/api/login", async (req, res) => {
-    const { username, password } = req.body;
+    // Zmieniono 'username' na 'email'
+    const { email, password } = req.body; 
 
     try {
-        const query = 'SELECT * FROM users WHERE username = $1';
-        const result = await pool.query(query, [username]);
+        const query = 'SELECT * FROM users WHERE email = $1';
+        const result = await pool.query(query, [email]);
         const user = result.rows[0];
 
         if (!user) {
             return res.json({ success: false, message: "Błędne dane logowania" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password_hash);
 
         if (isMatch) {
+            // Zapisanie ID użytkownika w sesji
+            req.session.userId = user.id; 
             res.json({ success: true, message: "Zalogowano pomyślnie" });
         } else {
             res.json({ success: false, message: "Błędne dane logowania" });
@@ -64,6 +76,10 @@ app.post("/api/login", async (req, res) => {
 
 // wysyłanie postów (formularz)
 app.post("/api/post", async (req, res) => {
+    // Sprawdzenie, czy użytkownik jest zalogowany
+    if (!req.session.userId) {
+        return res.status(403).json({ text: "Brak autoryzacji" });
+    }
     const { postTitle, hasImage } = req.body;
 
     try {
@@ -85,18 +101,17 @@ app.post("/api/post", async (req, res) => {
 // odbiór danych z automatyzacji
 app.post("/api/automation-webhook", (req, res) => {
     automationData = {
-        ...req.body, // Zachowaj istniejące dane (text, imageUrl)
-        additionalTexts: additionalTexts // Dodaj nowe teksty do obiektu
+        ...req.body,
+        additionalTexts: additionalTexts
     };
     res.json({ success: true });
 });
 
 // pobieranie danych z automatyzacji
 app.get("/api/automation-data", (req, res) => {
-    // Zwracamy cały obiekt, który teraz zawiera również additionalTexts
     res.json(automationData);
 });
 
-// uruchomienie serwera
-const PORT = 3000;
+// Uruchomienie serwera
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serwer działa na porcie ${PORT}`));
