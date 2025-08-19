@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
 
             // Użycie 'email' tak jak w bazie danych
-            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             const response = await fetch('/api/login', {
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }), // Wysłanie danych
+                body: JSON.stringify({ username, password }), // Wysłanie danych
             });
 
             const data = await response.json();

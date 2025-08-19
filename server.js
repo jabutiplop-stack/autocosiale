@@ -48,11 +48,11 @@ const additionalTexts = [
 // logowanie
 app.post("/api/login", async (req, res) => {
     // Zmieniono 'username' na 'email'
-    const { email, password } = req.body; 
+    const { username, password } = req.body; 
 
     try {
         const query = 'SELECT * FROM users WHERE username = $1';
-        const result = await pool.query(query, [email]);
+        const result = await pool.query(query, [username]);
         const user = result.rows[0];
     
         // DODANA WERYFIKACJA UŻYTKOWNIKA
